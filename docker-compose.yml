@@ -1,0 +1,68 @@
+version: "2.4"
+services:
+  neo-scan:
+    # https://github.com/CityOfZion/neo-scan/pull/392
+    # https://gitlab.com/CityOfZion/neo-scan/pipelines/45714484
+    image: registry.gitlab.com/cityofzion/neo-scan/api:45714484-master
+    ports:
+      - 4000:4000
+    depends_on:
+      neo-privnet:
+        condition: service_healthy
+      neo-postgres:
+        condition: service_healthy
+    extra_hosts:
+      # Disable outgoing connections:
+      - "min-api.cryptocompare.com:127.0.0.1"
+      - "www.cryptocompare.com:127.0.0.1"
+    environment:
+      - HOST=0.0.0.0
+      - PORT=4000
+    env_file:
+      - .env
+  neo-scan-sync:
+    container_name: neo-scan-sync
+    depends_on:
+      neo-privnet:
+        condition: service_healthy
+      neo-postgres:
+        condition: service_healthy
+    env_file:
+      - .env
+    image: 'registry.gitlab.com/cityofzion/neo-scan/sync:45714484-master'
+  neo-postgres:
+    image: postgres:11.1-alpine
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    env_file:
+      - .env
+  neo-privnet:
+    image: cityofzion/neo-privatenet:2.8.0
+    volumes:
+      - ./protocol.json:/opt/node1/neo-cli/protocol.json:ro
+      - ./protocol.json:/opt/node2/neo-cli/protocol.json:ro
+      - ./protocol.json:/opt/node3/neo-cli/protocol.json:ro
+      - ./protocol.json:/opt/node4/neo-cli/protocol.json:ro
+      - ./privnet.json:/neo-python/neo/data/protocol.privnet.json:ro
+      - ./scripts:/scripts:ro
+      - ${CONTRACT_FILE_LOCAL}:${CONTRACT_FILE}:ro
+    command: /scripts/run.sh
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s localhost:30333"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    ports:
+#      - 20333:20333
+#      - 20334:20334
+#      - 20335:20335
+#      - 20336:20336
+      - 30333:30333
+#      - 30334:30334
+#      - 30335:30335
+#      - 30336:30336
