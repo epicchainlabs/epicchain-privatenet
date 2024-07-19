@@ -1,6 +1,6 @@
 # EpicChain Private Network for Blockchain Testing
 
-This document provides comprehensive instructions for setting up and running a private network tailored for EpicChain blockchain testing. This setup is based on the [CityOfZion container](https://github.com/CityOfZion/neo-privatenet-docker) and has been customized to fit the needs of the EpicChain ecosystem.
+This document provides comprehensive instructions for setting up and running a private network tailored for EpicChain blockchain testing. This setup is based on the [EpicChain Lab's container](https://github.com/epicchainlabs/neo-privatenet-docker) and has been customized to fit the needs of the EpicChain ecosystem.
 
 ## How to Boot Up the Environment
 
